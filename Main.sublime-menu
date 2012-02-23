@@ -9,12 +9,12 @@
                 "children":
                 [
                     {
-                        "caption": "Save as GBK",
-                        "command": "save_as_gbk"
+                        "caption": "Save with GBK",
+                        "command": "save_with_gbk"
                     },
                     {
-                        "caption": "Save as UTF8",
-                        "command": "save_as_utf8"
+                        "caption": "Save with UTF8",
+                        "command": "save_with_utf8"
                     }
                 ]
             }
