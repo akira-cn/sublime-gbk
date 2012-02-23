@@ -4,7 +4,7 @@ import sublime, sublime_plugin
 import os, re
 import urllib
 
-MODULE_PATH = os.getcwd()
+TEMP_PATH = os.path.join(os.getcwd(), 'tmp')
 SEPERATOR = '                '
 
 def gbk2utf8(view):
@@ -19,9 +19,9 @@ def gbk2utf8(view):
 		print urllib.quote_plus(file_name)
 
 		tmp_file_name = os.path.basename(file_name)  + SEPERATOR + urllib.quote_plus(file_name)
-		tmp_file = MODULE_PATH + '/tmp/' + tmp_file_name
+		tmp_file = os.path.join(TEMP_PATH, tmp_file_name)
 
-		file(os.path.join(MODULE_PATH, tmp_file), 'w').write(text.encode('utf8'))
+		file(tmp_file, 'w').write(text.encode('utf8'))
 
 		window = sublime.active_window()
 		window.run_command('close')
@@ -49,7 +49,7 @@ class EventListener(sublime_plugin.EventListener):
 		gbk2utf8(view)
 	def on_post_save(self, view):
 		parts = view.file_name().split(SEPERATOR)
-		if(len(parts) > 1):
+		if(view.file_name().startswith(TEMP_PATH) and len(parts) > 1):
 			file_name = urllib.unquote_plus(parts[1].encode('utf-8')).decode('utf-8')
 			saveWithEncoding(view, file_name)
 
@@ -57,16 +57,21 @@ class SaveWithGbkCommand(sublime_plugin.TextCommand):
 	def __init__(self, view):
 		self.view = view
 	def run(self, edit):
-		saveWithEncoding(self.view)
-		sublime.active_window().run_command('close')
-		sublime.active_window().open_file(self.view.file_name())
+		parts = self.view.file_name().split(SEPERATOR)
+		if(not self.view.file_name().startswith(TEMP_PATH) and len(parts) <= 1):
+			saveWithEncoding(self.view)
+			sublime.active_window().run_command('close')
+			sublime.active_window().open_file(self.view.file_name())
+		else:
+			sublime.active_window().run_command('save')
 
 class SaveWithUtf8Command(sublime_plugin.TextCommand):
 	def __init__(self, view):
 		self.view = view
 	def run(self, edit):
 		parts = self.view.file_name().split(SEPERATOR)
-		if(len(parts) > 1):
+
+		if(self.view.file_name().startswith(TEMP_PATH) and len(parts) > 1):
 			file_name = urllib.unquote_plus(parts[1].encode('utf-8')).decode('utf-8')
 			saveWithEncoding(self.view, file_name, 'utf-8')
 			sublime.active_window().run_command('close')
