@@ -91,3 +91,4 @@ class SaveWithUtf8Command(sublime_plugin.TextCommand):
             sublime.active_window().open_file(file_name)
         else:
             sublime.active_window().run_command('save')
+
