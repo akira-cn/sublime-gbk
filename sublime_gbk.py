@@ -21,8 +21,9 @@ def gbk2utf8(view):
         tmp_view = window.open_file(tmp_file)
 
         if not tmp_view:
-            window.open_file(tmp_file)
+            tmp_view = window.open_file(tmp_file)
         
+        tmp_view.set_syntax_file(view.settings().get('syntax'))
         window.focus_view(view)
         window.run_command('close')
         window.focus_view(tmp_view)
