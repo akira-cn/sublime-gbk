@@ -8,13 +8,20 @@ def gbk2utf8(view):
         reg_all = sublime.Region(0, view.size())
         gbk = view.substr(reg_all).encode('gbk')
     except:
-        gbk = file(view.file_name()).read()
+        gbk = open(view.file_name(), 'rb').read()
         text = gbk.decode('gbk')
 
         tmp_file = u"%s.dump"%view.file_name()
-        f = file(tmp_file, 'w')
-        f.write(text.encode('utf8'))
-        f.close()
+        ver = int(sublime.version())
+
+        if ver >= 3000:
+            f = open(tmp_file, 'w', encoding='utf-8')
+            f.write(text)
+            f.close()
+        else:
+            f = open(tmp_file, 'w')
+            f.write(text.encode('utf8'))
+            f.close()
 
         window = sublime.active_window()
         
@@ -34,7 +41,7 @@ def saveWithEncoding(view, file_name = None, encoding = 'gbk'):
         file_name = view.file_name()
     reg_all = sublime.Region(0, view.size())
     text = view.substr(reg_all).encode(encoding)
-    gbk = file(file_name, 'w')
+    gbk = open(file_name, 'wb')
     gbk.write(text)
     gbk.close()    
 
@@ -84,3 +91,4 @@ class SaveWithUtf8Command(sublime_plugin.TextCommand):
             sublime.active_window().open_file(file_name)
         else:
             sublime.active_window().run_command('save')
+
